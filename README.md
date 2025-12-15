@@ -88,8 +88,27 @@ A specific tag version can be specified with `--vcs-ref <version tag>` if desire
 
 In order for `copier` to run post-generation tasks (like initializing git, installing pre-commit hooks, etc), the template source must be marked as trusted.
 This is done explicitly with the `--trust` flag when running `copier copy` above.
-You can also set a permanent trust for a source by adding `https://github.com/ceesem/cave-copier` to the `trusted_sources` list in a global settings file.
-Find the format and location of your global settings file for your system at the [copier documentation](https://copier.readthedocs.io/en/stable/settings/).
+
+#### Setting Default Username and Email and Trusted Sources
+
+If you want to avoid being prompted for your username and email every time you create a new project, you can set them in the global copier settings file as well.
+
+```yaml
+defaults:
+  user_name: "Your Name"
+  user_email: "your.email@example.com" 
+```
+
+You can also set a permanent trust for a source in this same file.
+For this template, the easiest way is to add `gh:ceesem/cave-copier` to the list.
+The item will look like:
+
+```yaml
+trust:
+  - gh:ceesem/cave-copier
+```
+
+Find the full format and location of your global settings file for your system at the [copier documentation](https://copier.readthedocs.io/en/stable/settings/).
 
 ### Updating an Existing Project
 
@@ -118,7 +137,7 @@ Quick experiments, throwaway analyses. However, because it runs through uv-lock,
 
 #### Features
 
-* Several common default python dependencies (pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, caveclient)
+* Several common defaultpython dependencies (pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, caveclient)
 * No version control (no git init)
 * No pre-commit hooks
 * Includes notebook.ipynb
