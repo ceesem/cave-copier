@@ -2,6 +2,14 @@
 
 A unified [copier](https://copier.readthedocs.io/) template for creating Python projects with a focus on CAVE analysis, built on `uv` and reasonably modern tooling (Pre-commit hooks, profiling, docs, testing, versioning, task queues).
 
+## TLDR
+
+If you have already set up your environment with `pipx`, `uv`, `copier`, and`poethepoet`, you can create a new project with:
+
+```bash
+copier copy --trust gh:ceesem/cave-copier /path/to/new-project
+```
+
 ## Overview
 
 This template supports four project types:
@@ -33,9 +41,22 @@ There are four items that need to be installed by hand before you use these temp
 If you already have any of them installed, you can skip that step.
 
 1. Install [pipx](https://pipx.pypa.io/). You will only need to install `pipx` once on your computer, and it is the most manual installation and should be done first. See [pipx documentation](https://pipx.pypa.io/stable/) for installation instructions.
-2. Install [uv](https://docs.astral.sh/uv/). You can install with pipx via `pipx install uv`.
-3. Install [copier](https://copier.readthedocs.io/) >= 9.0.0 and the `jinja2-time` extension. Do this with pipx: `pipx install copier && pipx inject copier jinja2-time`.
-4. (Optional but highly recommended) Install [poethepoet](https://poethepoet.natn.io/) via pipx: `pipx install poethepoet`.
+2. Install [uv](https://docs.astral.sh/uv/). You can install with pipx via 
+
+```bash
+pipx install uv
+```
+
+2. Install [copier](https://copier.readthedocs.io/) >= 9.0.0 and the `jinja2-time` extension. Do this with pipx:
+```bash
+pipx install copier && pipx inject copier jinja2-time
+```
+
+3. (Optional but highly recommended) Install [poethepoet](https://poethepoet.natn.io/) via pipx:
+
+```bash
+pipx install poethepoet
+```
 
 ## Usage
 
