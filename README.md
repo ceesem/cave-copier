@@ -40,7 +40,7 @@ The current toolset is:
 There are four items that need to be installed by hand before you use these templates.
 If you already have any of them installed, you can skip that step.
 
-1. Install [pipx](https://pipx.pypa.io/). You will only need to install `pipx` once on your computer, and it is the most manual installation and should be done first. See [pipx documentation](https://pipx.pypa.io/stable/) for installation instructions.
+1. Install [pipx](https://pipx.pypa.io/). You will only need to install `pipx` once on your computer. It is the most manual installation and should be done first. See [pipx documentation](https://pipx.pypa.io/stable/) for installation instructions.
 2. Install [uv](https://docs.astral.sh/uv/). You can install with pipx via 
 
 ```bash
@@ -89,9 +89,12 @@ A specific tag version can be specified with `--vcs-ref <version tag>` if desire
 In order for `copier` to run post-generation tasks (like initializing git, installing pre-commit hooks, etc), the template source must be marked as trusted.
 This is done explicitly with the `--trust` flag when running `copier copy` above.
 
-#### Setting Default Username and Email and Trusted Sources
+#### Setting Default Username/Email and Trusted Sources
 
-If you want to avoid being prompted for your username and email every time you create a new project, you can set them in the global copier settings file as well.
+Copier has a global settings file that can be used to set default values for your username and email, as well templates that it will always trust.
+Find the format and location of your global settings file for your system at the [copier documentation](https://copier.readthedocs.io/en/stable/settings/), which differs by platform.
+
+If you want to avoid being prompted for your username and email every time you create a new project, you can set them in the global copier settings file as:
 
 ```yaml
 defaults:
@@ -107,8 +110,6 @@ The item will look like:
 trust:
   - gh:ceesem/cave-copier
 ```
-
-Find the full format and location of your global settings file for your system at the [copier documentation](https://copier.readthedocs.io/en/stable/settings/).
 
 ### Updating an Existing Project
 
@@ -237,7 +238,7 @@ You can always list available poe tasks by simply typing `poe` in the project di
 
 ## Development
 
-The `test-templates.sh` script can be used to test all the templates subtypes locally.
+The `test-templates.sh` script can be used to test build all the templates subtypes locally.
 
 ## License
 
