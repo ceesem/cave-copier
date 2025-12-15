@@ -124,7 +124,7 @@ _message_after_copy: |
   Next steps:
   1. cd {{ directory_name }}
   2. Implement your task in src/{{ project_slug }}/task.py
-  3. Follow steps in  {{ directory_name }}/README.md for local or cloud task management
+  3. Follow steps in  {{ directory_name }}/HOW_TO_USE_TASKS.md for local or cloud task management
   {% endif %}
 
 # Message to display after update

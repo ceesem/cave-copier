@@ -44,29 +44,18 @@ poe bump patch  # or minor, or major
 1. Configure your task queue in `config/task.env`
 2. Configure your cluster in `config/cluster.env`
 3. Implement your task in `src/{{ project_slug }}/task.py`
+4. See HOW_TO_USE_TASKS.md for detailed information
 
-### Running Tasks
-
-```bash
-# Insert tasks into the queue
-poe insert_tasks
-
-# Launch a local worker
-poe launch_worker
-
-# Deploy to Kubernetes
-poe deploy_task
-```
 {% endif %}
 {% if template_type in ['analysis', 'library', 'task'] %}
 ## Profiling
 
 ```bash
 # Profile with scalene (CPU + memory)
-poe profile-all
+poe profile-all <your script>
 
 # Profile with pyinstrument (CPU only, nicer output)
-poe profile
+poe profile <your script>
 ```
 {% endif %}
 ## License
