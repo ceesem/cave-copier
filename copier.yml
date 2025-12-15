@@ -102,32 +102,29 @@ _message_after_copy: |
   Next steps:
   1. cd {{ directory_name }}
   2. Start coding in notebook.ipynb or create new Python files
-  3. Use `poe lab` to launch Jupyter Lab
+  3. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
   {% elif template_type == 'analysis' %}
   Next steps:
   1. cd {{ directory_name }}
-  2. Add your dependencies to pyproject.toml
-  3. Run `uv sync` to install
-  4. Use `poe lab` to launch Jupyter Lab
-  5. Start your analysis in src/{{ project_slug }}/
+  2. Add your dependencies to pyproject.toml via `uv add`
+  4. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
+  5. Put any analysis library code in src/{{ project_slug }}/
   {% elif template_type == 'library' %}
   Next steps:
   1. cd {{ directory_name }}
-  2. Add your dependencies to pyproject.toml
+  2. Add your dependencies to pyproject.toml via `uv add`
   3. Implement your library in src/{{ project_slug }}/
   4. Write tests in tests/
   5. Update documentation in docs/
   6. Use `poe test` to run tests
   7. Use `poe doc-preview` to preview docs
-  8. Use `poe bump patch` to version and release
+  8. Use `poe bump patch` to version
+  9. Release via `uv build` and `uv publish`
   {% elif template_type == 'task' %}
   Next steps:
   1. cd {{ directory_name }}
-  2. Configure your task queue in config/task.env
-  3. Configure your cluster in config/cluster.env
-  4. Implement your task in src/{{ project_slug }}/task.py
-  5. Use `poe insert_tasks` to add tasks to queue
-  6. Use `poe deploy_task` to deploy to Kubernetes
+  2. Implement your task in src/{{ project_slug }}/task.py
+  3. Follow steps in  {{ directory_name }}/README.md for local or cloud task management
   {% endif %}
 
 # Message to display after update
