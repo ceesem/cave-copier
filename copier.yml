@@ -1,0 +1,144 @@
+# Copier template configuration for uv-based Python projects
+
+# Minimum copier version required
+_min_copier_version: "9.0.0"
+
+# Questions asked during template generation
+template_type:
+  type: str
+  help: What type of project do you want to create?
+  choices:
+    - oneoff
+    - analysis
+    - library
+    - task
+  default: oneoff
+
+project_name:
+  type: str
+  help: What is your project name?
+  default: "My Project"
+  validator: "{% if not project_name %}Required{% endif %}"
+
+project_slug:
+  type: str
+  help: Python package name
+  default: "{{ project_name.lower().replace(' ', '_').replace('-', '_') }}"
+
+directory_name:
+  type: str
+  help: Directory name for the project
+  default: "{{ project_name.lower().replace(' ', '_') }}"
+
+project_description:
+  type: str
+  help: A short description of the project
+  default: "A short description of the project."
+
+user_name:
+  type: str
+  help: Your name
+  default: ""
+
+user_email:
+  type: str
+  help: Your email
+  default: ""
+
+github_username:
+  type: str
+  help: GitHub username
+  default: "ceesem"
+  when: "{{ template_type != 'oneoff' }}"
+
+initial_version:
+  type: str
+  help: Initial version number (format x.y.z)
+  default: "0.0.1"
+  when: "{{ template_type != 'oneoff' }}"
+  validator: "{% if not initial_version | regex_search('^\\d+\\.\\d+\\.\\d+$') %}Version must be in x.y.z format (e.g., 0.0.1){% endif %}"
+
+python_version:
+  type: str
+  help: Python version to use
+  default: "{% if template_type == 'oneoff' %}3.12{% else %}3.10{% endif %}"
+
+use_vim_jupyter:
+  type: bool
+  help: Include vim keybindings in Jupyter Lab?
+  default: true
+
+# Subdirectory for template
+_subdirectory: template
+
+# Files/directories to exclude from the template
+_exclude:
+  - "copier.yml"
+  - "copier.yaml"
+  - "~*"
+  - "*.py[co]"
+  - "__pycache__"
+  - ".git"
+  - ".DS_Store"
+  - "PLAN.md"
+
+# Jinja extensions to enable
+_jinja_extensions:
+  - jinja2_time.TimeExtension
+
+# Tasks to run after generation
+_tasks:
+  - "cd {{ directory_name }} && uv sync"
+  - "{% if template_type == 'library' %}cd {{ directory_name }}/scratch && uv sync{% endif %}"
+  - "{% if template_type != 'oneoff' %}cd {{ directory_name }} && git init{% endif %}"
+  - "{% if template_type != 'oneoff' %}cd {{ directory_name }} && uvx pre-commit install{% endif %}"
+  - "{% if template_type == 'library' %}cd {{ directory_name }} && chmod +x .bmv-post-commit.sh{% endif %}"
+
+# Message to display after generation
+_message_after_copy: |
+  Your {{ template_type }} project "{{ project_name }}" has been created successfully!
+
+  {% if template_type == 'oneoff' %}
+  Next steps:
+  1. cd {{ directory_name }}
+  2. Start coding in notebook.ipynb or create new Python files
+  3. Use `poe lab` to launch Jupyter Lab
+  {% elif template_type == 'analysis' %}
+  Next steps:
+  1. cd {{ directory_name }}
+  2. Add your dependencies to pyproject.toml
+  3. Run `uv sync` to install
+  4. Use `poe lab` to launch Jupyter Lab
+  5. Start your analysis in src/{{ project_slug }}/
+  {% elif template_type == 'library' %}
+  Next steps:
+  1. cd {{ directory_name }}
+  2. Add your dependencies to pyproject.toml
+  3. Implement your library in src/{{ project_slug }}/
+  4. Write tests in tests/
+  5. Update documentation in docs/
+  6. Use `poe test` to run tests
+  7. Use `poe doc-preview` to preview docs
+  8. Use `poe bump patch` to version and release
+  {% elif template_type == 'task' %}
+  Next steps:
+  1. cd {{ directory_name }}
+  2. Configure your task queue in config/task.env
+  3. Configure your cluster in config/cluster.env
+  4. Implement your task in src/{{ project_slug }}/task.py
+  5. Use `poe insert_tasks` to add tasks to queue
+  6. Use `poe deploy_task` to deploy to Kubernetes
+  {% endif %}
+
+# Message to display after update
+_message_after_update: |
+  Your project has been updated!
+
+  {% if _copier_conf.answers_file.template_type != template_type %}
+  🎉 Template type changed from {{ _copier_conf.answers_file.template_type }} to {{ template_type }}!
+
+  This is a major upgrade. Please review the changes carefully:
+  - New files and directories have been added
+  - Your pyproject.toml has been updated
+  - Run `uv sync` to update dependencies
+  {% endif %}

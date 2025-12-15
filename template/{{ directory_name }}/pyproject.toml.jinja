@@ -1,0 +1,228 @@
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
+name = "{{ project_slug }}"
+version = "{% if template_type == 'oneoff' %}0.0.0{% else %}{{ initial_version }}{% endif %}"
+description = "{{ project_description }}"
+readme = "README.md"
+requires-python = "{% if template_type == 'oneoff' %}>=3.12{% else %}>=3.10{% endif %}"
+dependencies = [
+{%- if template_type == 'oneoff' %}
+    "pandas",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "caveclient>=8.0.1",
+{%- elif template_type == 'task' %}
+    "cloud-files>=4.30.1",
+    "task-queue>=2.14.0",
+    "pandas>=2.2.3",
+    "caveclient>=8.0.1",
+{%- endif %}
+]
+authors = [
+    { name = "{{ user_name }}", email = "{{ user_email }}" },
+]
+{% if template_type != 'oneoff' %}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+{% endif %}
+[dependency-groups]
+dev = [
+    "ipykernel",
+{%- if template_type == 'library' %}
+    "pytest",
+    "pytest-cov",
+    "bump-my-version",
+{%- endif %}
+]
+lint = [
+    "ruff",
+]
+{%- if template_type in ['analysis', 'library', 'task'] %}
+profile = [
+    "scalene",
+    "pyinstrument",
+]
+{%- endif %}
+{%- if template_type == 'library' %}
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+{%- endif %}
+
+[tool.uv]
+default-groups = [
+    "dev",
+    "lint",
+{%- if template_type in ['analysis', 'library', 'task'] %}
+    "profile",
+{%- endif %}
+{%- if template_type == 'library' %}
+    "docs",
+{%- endif %}
+]
+{% if template_type == 'library' %}
+[tool.bumpversion]
+current_version = "{{ initial_version }}"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+regex = false
+ignore_missing_version = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "v{new_version}"
+commit_args = ""
+pre_commit_hooks = ['uv sync', 'git add uv.lock']
+post_commit_hooks = ["./.bmv-post-commit.sh"]
+
+[[tool.bumpversion.files]]
+filename = "src/{{ project_slug }}/__init__.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
+{% endif %}
+# Ruff configuration - minimal rules to start
+# See https://docs.astral.sh/ruff/rules/ for available rules
+# Common additions: select = ["E", "F", "I"] for errors, pyflakes, and isort
+[tool.ruff]
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select=["E9","F63","F7","F82"]  # Minimal: syntax errors and undefined names
+{% if template_type == 'library' %}
+[tool.poe.tasks.drybump]
+cmd = "uv run bump-my-version bump --dry-run --verbose"
+help = "Dry run of version bump for the project. Use with 'patch', 'minor', or 'major' to specify the version change."
+
+[tool.poe.tasks.bump]
+cmd = "uv run bump-my-version bump"
+help = "Bump the version number in the project. Use with 'patch', 'minor', or 'major' to specify the version change."
+
+[tool.poe.tasks.test]
+cmd = "uv run pytest --cov={{ project_slug }} tests"
+help = "Run pytest with code coverage."
+
+[tool.poe.tasks.doc-preview]
+cmd = "uv run mkdocs serve"
+help = "Preview documentation build locally"
+{% endif %}
+{%- if template_type in ['analysis', 'library', 'task'] %}
+[tool.poe.tasks.profile-all]
+cmd = "uv run scalene"
+help = "Profile cpu and memory of task with scalene"
+
+[tool.poe.tasks.profile]
+cmd = "uv run pyinstrument -r html"
+help = "Profile cpu of task with pyinstrument"
+{% endif %}
+{%- if template_type == 'task' %}
+[tool.poe.tasks.insert_tasks]
+cmd = "uv run --env-file $env_file --frozen insert_tasks.py"
+help = "Insert tasks into a taskqueue"
+    [[tool.poe.tasks.insert_tasks.args]]
+    name = "env_file"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables"
+    options = ['-e', '--env-file']
+
+[tool.poe.tasks.check_filequeue]
+cmd = "uv run --env-file $env_file --frozen sh check_filequeue.sh"
+help = "Check the status of a taskqueue (filequeue only)"
+    [[tool.poe.tasks.check_filequeue.args]]
+    name = "env_file"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables"
+    options = ['-e', '--env-file']
+
+[tool.poe.tasks.launch_worker]
+cmd = "uv run --env-file $env_file --frozen run.py"
+    [[tool.poe.tasks.launch_worker.args]]
+    name = "env_file"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables"
+    options = ['-e', '--env-file']
+
+[tool.poe.tasks.reset_queue]
+cmd = "uv run --env-file $env_file --frozen sh reset_filequeue.sh"
+    [[tool.poe.tasks.reset_queue.args]]
+    name = "env_file"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables"
+    options = ['-e', '--env-file']
+
+[tool.poe.tasks.delete_local_queue]
+cmd = "uv run --env-file $env_file --frozen sh delete_filequeue.sh"
+help = "Delete a taskqueue (local filequeue only)"
+    [[tool.poe.tasks.delete_local_queue.args]]
+    name = "env_file"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables"
+    options = ['-e', '--env-file']
+
+[tool.poe.tasks.make_scripts]
+cmd = "bash scripts/process_template.sh $task_config $cluster_config"
+help = "Make scripts for generating and configuring Kubernetes clusters and nodes"
+
+    [[tool.poe.tasks.make_scripts.args]]
+    name = "task_config"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables for the task."
+    options = ['-e', '--env-file']
+
+    [[tool.poe.tasks.make_scripts.args]]
+    name = "cluster_config"
+    default = 'config/cluster.env'
+    help = "The dotenv file containing the environment variables to set up the cluster"
+    options = ['-c', '--cluster-env']
+
+[tool.poe.tasks.launch_cluster]
+cmd = "bash scripts/make_cluster.sh"
+help = "Launch a Kubernetes cluster after configuration."
+
+[tool.poe.tasks.apply_task]
+cmd = "kubectl apply -f scripts/kube-task.yml"
+help = "Apply a task configuration to a Kubernetes cluster."
+
+[tool.poe.tasks.deploy_task]
+sequence = ["make_scripts -e ${task_config} -c ${cluster_config}", "launch_cluster", "apply_task"]
+help = "Apply configuration, launch cluster, and deploy a task to a Kubernetes cluster."
+    [[tool.poe.tasks.deploy_task.args]]
+    name = "task_config"
+    default = 'config/task.env'
+    help = "The dotenv file containing the environment variables for the task."
+    options = ['-e', '--env-file']
+    [[tool.poe.tasks.deploy_task.args]]
+    name = "cluster_config"
+    default = 'config/cluster.env'
+    help = "The dotenv file containing the environment variables to set up the cluster"
+    options = ['-c', '--cluster-env']
+
+[tool.poe.tasks.delete_cluster]
+cmd = "bash scripts/delete_cluster.sh"
+help = "Delete a Kubernetes cluster. This will delete all resources associated with the cluster!"
+{% endif %}
+[tool.poe.tasks.lab]
+cmd = "uv run --with jupyterlab{% if use_vim_jupyter %} --with jupyterlab-vim{% endif %} --with jupyterlab-code-formatter --with jupyter-resource-usage --with jupyterlab-execute-time --with catppuccin-jupyterlab --with ipywidgets jupyter lab --no-browser"
+help = "Start Jupyter Lab"
+{% if template_type == 'library' %}
+[tool.poe.tasks.scratch-lab]
+cwd = "scratch"
+cmd = "uv run --with jupyterlab{% if use_vim_jupyter %} --with jupyterlab-vim{% endif %} --with jupyterlab-code-formatter --with jupyter-resource-usage --with jupyterlab-execute-time --with catppuccin-jupyterlab --with ipywidgets jupyter lab --no-browser"
+help = "Start Jupyter Lab"
+{% endif %}

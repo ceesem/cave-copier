@@ -1,0 +1,74 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Setup
+
+This project uses `uv` for dependency management and `poe` for task running.
+
+```bash
+# Install dependencies
+uv sync
+
+# Launch Jupyter Lab
+poe lab
+```
+{% if template_type == 'library' %}
+## Development
+
+### Running Tests
+
+```bash
+poe test
+```
+
+### Building Documentation
+
+```bash
+poe doc-preview
+```
+
+### Versioning
+
+```bash
+# Dry run to see what will change
+poe drybump patch
+
+# Actually bump the version
+poe bump patch  # or minor, or major
+```
+{% endif %}
+{% if template_type == 'task' %}
+## Task Queue Setup
+
+1. Configure your task queue in `config/task.env`
+2. Configure your cluster in `config/cluster.env`
+3. Implement your task in `src/{{ project_slug }}/task.py`
+
+### Running Tasks
+
+```bash
+# Insert tasks into the queue
+poe insert_tasks
+
+# Launch a local worker
+poe launch_worker
+
+# Deploy to Kubernetes
+poe deploy_task
+```
+{% endif %}
+{% if template_type in ['analysis', 'library', 'task'] %}
+## Profiling
+
+```bash
+# Profile with scalene (CPU + memory)
+poe profile-all
+
+# Profile with pyinstrument (CPU only, nicer output)
+poe profile
+```
+{% endif %}
+## License
+
+MIT License - see LICENSE file for details.
