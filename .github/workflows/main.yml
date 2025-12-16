@@ -21,4 +21,4 @@ jobs:
         with:
           version: "latest"
       - name: Run template test
-        run: uvx run --python ${{ matrix.python-version }} --with copier jinja2-time python test_template.sh
+        run: bash test_template.sh
