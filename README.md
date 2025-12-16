@@ -157,7 +157,7 @@ Longer-term analysis projects, such as for a paper
 * Empty default dependencies
 * Profiling tools (scalene, pyinstrument)
 * Structured src/ package layout
-* Python 3.10+
+* Python 3.12
 
 ### `library`
 
@@ -197,7 +197,7 @@ The library `.venv` can be launched as a kernel from either the main directory o
 * Kubernetes deployment templates
 * Scripts for cluster management
 * Task queue management commands
-* Python 3.10+
+* Python 3.12
 
 #### Notes
 
