@@ -21,4 +21,4 @@ jobs:
         with:
           version: "latest"
       - name: Run template test
-        run: bash test_template.sh
+        run: bash ./test-templates.sh
