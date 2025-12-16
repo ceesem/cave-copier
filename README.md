@@ -81,7 +81,7 @@ You'll be prompted to choose:
 
 The recommended approach for creating new project templates for `copier` is to use github, which is necessary for versioning and updating.
 Whether you reference a git-managed local path or a github repo, `copier` will by default look at **tags** and not the latest commit on the default branch.
-Assuming tags are versioned like `1.0.4`, the highest version will be used.
+Assuming tags are versioned like `1.0.3`, the highest tag version will be used.
 A specific tag version can be specified with `--vcs-ref <version tag>` if desired.
 
 #### Tasks Need Trust
@@ -131,7 +131,7 @@ More details on how updating projects works and additional options you have can 
 
 ## Template Types
 
-### `oneoff`
+### 1. `oneoff`
 
 #### Use case
 
@@ -145,7 +145,7 @@ Quick experiments, throwaway analyses. However, because it runs through uv-lock,
 * Includes notebook.ipynb
 * Python 3.12+
 
-### `analysis`
+### 2. `analysis`
 
 #### Use case
 
@@ -160,7 +160,7 @@ Longer-term analysis projects, such as for a paper
 * Structured src/ package layout
 * Python 3.12
 
-### `library`
+### 3. `library`
 
 #### Use case
 
@@ -186,7 +186,7 @@ For example, you might want to add `matplotlib` to visualize results to ensure t
 You can add those to `scratch/pyproject.toml` without them interfering with the strict library requirements.
 The library `.venv` can be launched as a kernel from either the main directory or the scratch directory with `poe scratch-lab`.
 
-### `task`
+### 4. `task`
 
 **Use case**: Distributed task queue systems
 
