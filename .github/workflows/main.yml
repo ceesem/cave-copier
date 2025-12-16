@@ -20,5 +20,7 @@ jobs:
         uses: astral-sh/setup-uv@v2
         with:
           version: "latest"
+      - name: Install copier
+        run: pipx install copier && pipx inject copier jinja2-time
       - name: Run template test
         run: bash ./test-templates.sh
