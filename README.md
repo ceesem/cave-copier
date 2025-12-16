@@ -100,6 +100,7 @@ If you want to avoid being prompted for your username and email every time you c
 defaults:
   user_name: "Your Name"
   user_email: "your.email@example.com" 
+  github_user: "your-github-username"
 ```
 
 You can also set a permanent trust for a source in this same file.

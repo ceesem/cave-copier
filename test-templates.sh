@@ -36,7 +36,7 @@ test_template() {
         --data "project_description=Test project for ${template_type}" \
         --data "user_name=Test User" \
         --data "user_email=test@example.com" \
-        --data "github_username=testuser" \
+        --data "github_user=testuser" \
         --data "initial_version=0.0.1" \
         --data "python_version=3.12" \
         --data "use_vim_jupyter=true" \

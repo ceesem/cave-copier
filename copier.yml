@@ -45,10 +45,10 @@ user_email:
   help: Your email
   default: ""
 
-github_username:
+github_user:
   type: str
   help: GitHub username
-  default: "ceesem"
+  default: ""
   when: "{{ template_type != 'oneoff' }}"
 
 initial_version:
