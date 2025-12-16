@@ -2,6 +2,17 @@
 
 A unified [copier](https://copier.readthedocs.io/) template for creating Python projects with a focus on CAVE analysis, built on `uv` and reasonably modern tooling (Pre-commit hooks, profiling, docs, testing, versioning, task queues).
 
+## Table of Contents
+
+- [TLDR](#tldr)
+- [Overview](#overview)
+- [Before You Start](#before-you-start)
+- [Usage](#usage)
+- [Template Types](#template-types)
+- [Common Commands / Poe Tasks](#common-commands--poe-tasks)
+- [Development](#development)
+- [License](#license)
+
 ## TLDR
 
 If you have already set up your environment with `pipx`, `uv`, `copier`, and`poethepoet`, you can create a new project with:
