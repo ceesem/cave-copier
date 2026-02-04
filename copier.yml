@@ -61,7 +61,8 @@ initial_version:
 python_version:
   type: str
   help: Python version to use
-  default: "{% if template_type != 'library' %}3.10{% else %}3.12{% endif %}"
+  default: "{% if template_type != 'library' %}3.13{% else %}3.13{% endif %}"
+# Allow differences, but honestly it's easier to default to 3.13 now.
 
 use_vim_jupyter:
   type: bool
