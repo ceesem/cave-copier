@@ -91,9 +91,15 @@ _jinja_extensions:
 _tasks:
   - "cd {{ directory_name }} && uv sync"
   - "{% if template_type == 'library' %}cd {{ directory_name }}/scratch && uv sync{% endif %}"
-  - "{% if template_type != 'oneoff' %}cd {{ directory_name }} && git init{% endif %}"
-  - "{% if template_type != 'oneoff' %}cd {{ directory_name }} && uvx pre-commit install{% endif %}"
-  - "{% if template_type == 'library' %}cd {{ directory_name }} && chmod +x .bmv-post-commit.sh{% endif %}"
+  # git init, pre-commit install, and chmod only run on copier copy/recopy, not update.
+  # _copier_operation is "update" for all phases of copier update (including the
+  # old-copy temp-dir phase that triggers the nested-submodule git add failure).
+  - command: "cd {{ directory_name }} && git init"
+    when: "{{ _copier_operation == 'copy' and template_type != 'oneoff' }}"
+  - command: "cd {{ directory_name }} && uvx pre-commit install"
+    when: "{{ _copier_operation == 'copy' and template_type != 'oneoff' }}"
+  - command: "cd {{ directory_name }} && chmod +x .bmv-post-commit.sh"
+    when: "{{ _copier_operation == 'copy' and template_type == 'library' }}"
 
 # Message to display after generation
 _message_after_copy: |
