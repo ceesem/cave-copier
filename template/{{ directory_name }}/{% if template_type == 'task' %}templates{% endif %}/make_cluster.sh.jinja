@@ -26,6 +26,8 @@ gcloud container --project "${GOOGLE_PROJECT_NAME}" clusters create "$GOOGLE_CLU
     --max-unavailable-upgrade 0 \
     --max-pods-per-node "${PODS_PER_NODE}" \
     --enable-shielded-nodes \
+    --shielded-secure-boot \
+    --shielded-integrity-monitoring \
     --node-locations "${GOOGLE_ZONE}"
 
 gcloud container clusters get-credentials --zone ${GOOGLE_ZONE} ${GOOGLE_CLUSTER_NAME}
