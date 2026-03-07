@@ -12,6 +12,7 @@ template_type:
     - analysis
     - library
     - task
+    - tabula-rasa
   default: oneoff
 
 project_name:
@@ -49,13 +50,13 @@ github_user:
   type: str
   help: GitHub username
   default: ""
-  when: "{{ template_type != 'oneoff' }}"
+  when: "{{ template_type not in ['oneoff', 'tabula-rasa'] }}"
 
 initial_version:
   type: str
   help: Initial version number (format x.y.z)
   default: "0.0.1"
-  when: "{{ template_type != 'oneoff' }}"
+  when: "{{ template_type not in ['oneoff', 'tabula-rasa'] }}"
   validator: "{% if not initial_version | regex_search('^\\d+\\.\\d+\\.\\d+$') %}Version must be in x.y.z format (e.g., 0.0.1){% endif %}"
 
 python_version:
@@ -95,9 +96,9 @@ _tasks:
   # _copier_operation is "update" for all phases of copier update (including the
   # old-copy temp-dir phase that triggers the nested-submodule git add failure).
   - command: "cd {{ directory_name }} && git init"
-    when: "{{ _copier_operation == 'copy' and template_type != 'oneoff' }}"
+    when: "{{ _copier_operation == 'copy' and template_type not in ['oneoff'] }}"
   - command: "cd {{ directory_name }} && uvx pre-commit install"
-    when: "{{ _copier_operation == 'copy' and template_type != 'oneoff' }}"
+    when: "{{ _copier_operation == 'copy' and template_type not in ['oneoff'] }}"
   - command: "cd {{ directory_name }} && chmod +x .bmv-post-commit.sh"
     when: "{{ _copier_operation == 'copy' and template_type == 'library' }}"
 
@@ -132,6 +133,12 @@ _message_after_copy: |
   1. cd {{ directory_name }}
   2. Implement your task in src/{{ project_slug }}/task.py
   3. Follow steps in  {{ directory_name }}/HOW_TO_USE_TASKS.md for local or cloud task management
+  {% elif template_type == 'tabula-rasa' %}
+  Next steps:
+  1. cd {{ directory_name }}
+  2. Add your dependencies to pyproject.toml via `uv add`
+  3. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
+  4. Put any code in src/{{ project_slug }}/
   {% endif %}
 
 # Message to display after update

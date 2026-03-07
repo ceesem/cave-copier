@@ -1,0 +1,148 @@
+# {{project_slug}}
+
+{{project_description}}
+
+## Team Tools & Domain Context
+
+<!-- See team reference doc for CAVE ecosystem, caveclient, neuroglancer,
+     task queue patterns, and connectomics-specific design decisions:
+     [link TBD] -->
+
+## Development Environment
+
+```bash
+# Install dependencies (creates virtual environment)
+uv sync
+
+# Add a new dependency
+uv add <package>
+
+# Linting / formatting
+uv run ruff check src/
+uv run ruff format src/
+```
+
+### Key Commands
+
+| Command | Description |
+|---------|-------------|
+| `poe lab` | Launch Jupyter Lab |
+{%- if template_type in ['analysis', 'library', 'task'] %}
+| `poe profile` | Profile CPU with pyinstrument (HTML report) |
+| `poe profile-all` | Profile CPU + memory with scalene |
+{%- endif %}
+{%- if template_type == 'library' %}
+| `poe scratch-lab` | Jupyter Lab in the scratch/ directory |
+| `poe test` | Run pytest with coverage |
+| `poe doc-preview` | Preview documentation locally |
+| `poe drybump patch/minor/major` | Dry-run version bump |
+| `poe bump patch/minor/major` | Bump version and create tag |
+{%- endif %}
+{%- if template_type == 'task' %}
+| `poe insert_tasks` | Insert tasks into the task queue |
+| `poe launch_worker` | Launch a local worker process |
+| `poe check_filequeue` | Check filequeue status |
+| `poe reset_queue` | Reset the file queue |
+| `poe make_scripts` | Generate Kubernetes scripts from config |
+| `poe deploy_task` | Build scripts, launch cluster, deploy task |
+| `poe delete_cluster` | Delete the Kubernetes cluster |
+{%- endif %}
+
+{% if template_type == 'oneoff' -%}
+## Exploration
+
+Notebook-first project. Keep explorations in root notebooks; move any reusable logic to `src/{{project_slug}}/`.
+
+{% elif template_type == 'analysis' -%}
+## Analysis Structure
+
+Reusable code lives in `src/{{project_slug}}/`. Notebooks and scripts import from there.
+
+### Profiling
+
+- `poe profile <script.py>` — CPU profiling via pyinstrument (HTML report, good for iterating)
+- `poe profile-all <script.py>` — CPU + memory via scalene (use when memory is suspect)
+
+{% elif template_type == 'library' -%}
+## Library Development
+
+### Testing Strategy
+
+Implement both integration tests and unit tests:
+
+- **Integration tests**: Real-world workflows, end-to-end functionality
+- **Unit tests**: Individual methods, edge cases, error conditions
+- **Coverage target**: >90% line coverage, >85% branch coverage
+
+```bash
+poe test                                                       # full suite with coverage
+uv run pytest tests/test_foo.py -v                             # single file
+uv run pytest --cov={{project_slug}} --cov-report=html tests/  # HTML report
+```
+
+### Release Process
+
+```bash
+poe drybump patch   # preview what will change
+poe bump patch      # bump version, commit, tag (also: minor, major)
+```
+
+This updates `pyproject.toml`, `src/{{project_slug}}/__init__.py`, commits, and tags.
+
+### Scratch Dir
+
+`poe scratch-lab` opens Jupyter Lab in `scratch/`, isolated from the main package environment.
+
+{% elif template_type == 'task' -%}
+## Task Queue Workflow
+
+Workers pull tasks from a queue (filequeue for local dev, cloud queue for production).
+
+1. Implement your task logic in `src/{{project_slug}}/task.py`
+2. Configure task and cluster settings in `config/task.env` and `config/cluster.env`
+3. Insert tasks: `poe insert_tasks`
+
+### Kubernetes Deployment
+
+```bash
+# Step-by-step
+poe make_scripts    # generate cluster/task scripts from config
+poe launch_cluster  # create the GKE cluster
+poe apply_task      # deploy the task to the cluster
+
+# Or all-in-one
+poe deploy_task
+
+# Cleanup
+poe delete_cluster
+```
+
+See `HOW_TO_USE_TASKS.md` for detailed setup instructions.
+
+{% elif template_type == 'tabula-rasa' -%}
+## Blank Slate
+
+Add dependencies as needed with `uv add <package>`.
+
+{% endif -%}
+---
+
+## Project Overview
+
+<!-- Describe what this project does and why it exists -->
+
+## Architecture & Key Files
+
+<!-- List key files and how they fit together -->
+
+## Data & External Dependencies
+
+<!-- Document datasets, services, APIs, and file paths this project depends on -->
+
+## Conventions & Patterns
+
+<!-- Describe coding conventions, naming patterns, and design decisions -->
+
+## Notes
+
+<!-- Miscellaneous notes, gotchas, TODOs -->

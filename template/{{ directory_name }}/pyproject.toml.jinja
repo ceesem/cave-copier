@@ -1,12 +1,12 @@
 [build-system]
-requires = ["uv_build>=0.9.5,<0.10.0"]
+requires = ["uv_build>=0.9.5,<1.0.0"]
 build-backend = "uv_build"
 
 [project]
 name = "{{ project_slug }}"
-version = "{% if template_type == 'oneoff' %}0.0.0{% else %}{{ initial_version }}{% endif %}"
+version = "{% if template_type in ['oneoff', 'tabula-rasa'] %}0.0.0{% else %}{{ initial_version }}{% endif %}"
 description = "{{ project_description }}"
-readme = "README.md"
+{% if template_type == 'library' %}readme = "README.md"{% endif %}
 requires-python = "{% if template_type == 'oneoff' %}>=3.12{% else %}>=3.10{% endif %}"
 dependencies = [
 {%- if template_type == 'oneoff' %}
@@ -22,12 +22,13 @@ dependencies = [
     "task-queue>=2.14.0",
     "pandas>=2.2.3",
     "caveclient>=8.0.1",
+{%- elif template_type == 'tabula-rasa' %}
 {%- endif %}
 ]
 authors = [
     { name = "{{ user_name }}", email = "{{ user_email }}" },
 ]
-{% if template_type != 'oneoff' %}
+{% if template_type not in ['oneoff', 'tabula-rasa'] %}
 classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
@@ -130,7 +131,8 @@ help = "Profile cpu and memory of task with scalene"
 [tool.poe.tasks.profile]
 cmd = "uv run pyinstrument -r html"
 help = "Profile cpu of task with pyinstrument"
-{% endif %}
+{%- endif %}
+
 {%- if template_type == 'task' %}
 [tool.poe.tasks.insert_tasks]
 cmd = "uv run --env-file $env_file --frozen insert_tasks.py"

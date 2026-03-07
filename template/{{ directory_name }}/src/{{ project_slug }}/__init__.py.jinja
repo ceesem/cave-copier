@@ -1,3 +1,3 @@
 """{{ project_description }}"""
 
-__version__ = "{% if template_type == 'oneoff' %}0.0.0{% else %}{{ initial_version }}{% endif %}"
+__version__ = "{% if template_type in ['oneoff', 'tabula-rasa'] %}0.0.0{% else %}{{ initial_version }}{% endif %}"
