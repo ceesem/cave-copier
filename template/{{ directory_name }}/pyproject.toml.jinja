@@ -7,7 +7,7 @@ name = "{{ project_slug }}"
 version = "{% if template_type in ['oneoff', 'tabula-rasa'] %}0.0.0{% else %}{{ initial_version }}{% endif %}"
 description = "{{ project_description }}"
 {% if template_type == 'library' %}readme = "README.md"{% endif %}
-requires-python = "{% if template_type == 'oneoff' %}>=3.12{% else %}>=3.10{% endif %}"
+requires-python = "{% if template_type == 'oneoff' %}>=3.12{% else %}>=3.11{% endif %}"
 dependencies = [
 {%- if template_type == 'oneoff' %}
     "pandas",
@@ -29,9 +29,8 @@ authors = [
     { name = "{{ user_name }}", email = "{{ user_email }}" },
 ]
 {% if template_type not in ['oneoff', 'tabula-rasa'] %}
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-]
+license = "MIT"
+license-files = ["LICENSE"]
 {% endif %}
 [dependency-groups]
 dev = [
