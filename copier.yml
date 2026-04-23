@@ -73,6 +73,10 @@ use_vim_jupyter:
 # Subdirectory for template
 _subdirectory: template
 
+# Write answers file inside the project directory so `copier update` can be
+# run from within the project without needing the parent directory.
+_answers_file: "{{ directory_name }}/.copier-answers.yml"
+
 # Files/directories to exclude from the template
 _exclude:
   - "copier.yml"
@@ -90,8 +94,14 @@ _jinja_extensions:
 
 # Tasks to run after generation
 _tasks:
-  - "cd {{ directory_name }} && uv sync"
-  - "{% if template_type == 'library' %}cd {{ directory_name }}/scratch && uv sync{% endif %}"
+  # On copy, run from parent dir (cd into project subdir). On update, run from
+  # within the project dir directly (no cd needed, and cd would fail).
+  - command: "cd {{ directory_name }} && uv sync"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "uv sync"
+    when: "{{ _copier_operation != 'copy' }}"
+  - command: "cd {{ directory_name }}/scratch && uv sync"
+    when: "{{ _copier_operation == 'copy' and template_type == 'library' }}"
   # git init, pre-commit install, and chmod only run on copier copy/recopy, not update.
   # _copier_operation is "update" for all phases of copier update (including the
   # old-copy temp-dir phase that triggers the nested-submodule git add failure).
