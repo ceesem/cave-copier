@@ -198,6 +198,27 @@ For example, you might want to add `matplotlib` to visualize results to ensure t
 You can add those to `scratch/pyproject.toml` without them interfering with the strict library requirements.
 The library `.venv` can be launched as a kernel from either the main directory or the scratch directory with `poe scratch-lab`.
 
+**Releasing to PyPI**
+
+Releasing is two steps:
+
+1. `poe bump patch|minor|major` updates the version, commits, tags `vX.Y.Z` and pushes with `git push --follow-tags`.
+   It refuses if the current version isn't on PyPI yet, because bumping would skip a version nobody can install.
+   Set `BUMP_ALLOW_UNRELEASED=1` to override.
+2. `gh release create vX.Y.Z --generate-notes` publishes it. Creating a GitHub Release runs `.github/workflows/publish.yml`,
+   which checks that the tag matches the package version, runs the tests, builds, and uploads to PyPI.
+
+The workflow uses [PyPI trusted publishing](https://docs.pypi.org/trusted-publishers/), so there's no API token to manage,
+but each new library needs a one-time setup that the template can't do for you:
+
+1. On PyPI, add a trusted publisher. If the project doesn't exist on PyPI yet, add it as a
+   ["pending publisher"](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/) from your account's Publishing page.
+   Use owner `<github_user>`, repository `<project_slug>`, workflow `publish.yml`, environment `pypi`.
+2. On GitHub, create an environment named `pypi` (repo Settings → Environments).
+
+In a brand-new project, `poe bump` refuses until the initial version is on PyPI, so start by publishing it:
+`gh release create v<initial_version> --generate-notes`.
+
 ### 4. `task`
 
 **Use case**: Distributed task queue systems
