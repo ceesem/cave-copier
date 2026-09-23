@@ -9,6 +9,7 @@ A unified [copier](https://copier.readthedocs.io/) template for creating Python 
 - [Before You Start](#before-you-start)
 - [Usage](#usage)
 - [Template Types](#template-types)
+- [Python Versions](#python-versions)
 - [Common Commands / Poe Tasks](#common-commands--poe-tasks)
 - [Development](#development)
 - [License](#license)
@@ -185,7 +186,7 @@ Publishable Python libraries with documentation and testing
 * bump-my-version for semantic versioning
 * GitHub Actions (testing on Python 3.12-3.14, docs publishing, PyPI publishing on release)
 * Scratch environment for development
-* Supports Python 3.12+ (`requires-python = ">=3.12"`)
+* Supports Python 3.12+ (`requires-python = ">=3.12"`, see [Python Versions](#python-versions))
 
 #### Notes
 
@@ -218,6 +219,22 @@ The library `.venv` can be launched as a kernel from either the main directory o
 This is designed to work with the [python-task-queue](https://github.com/seung-lab/python-task-queue) in relatively easy to deploy manner, but for a very specific use case of SQS-managed task queues and GKE-based workers.
 There is some support for local testing of the queue and workers via docker and FileQueues in task-queue, but the main focus is on cloud deployment.
 More documentation is available in the `README.md` file that comes with the generated project.
+
+## Python Versions
+
+All templates default to Python 3.13 (the `python_version` question, written to `.python-version`).
+The template refuses anything older than 3.12.
+
+`requires-python` is set on purpose, because uv resolves the lockfile for *every* Python version it allows, not just the one you run:
+
+* **`oneoff`, `analysis`, `task`, `tabula-rasa`, and the library's `scratch/`** use `requires-python = ">={python_version}"`.
+  These projects run on one Python, so there's no reason to lock for older ones.
+  A looser range (e.g. `>=3.10`) makes uv split the lockfile per Python version, and `uv add` fails for any
+  package that has dropped the older versions (e.g. `numpy>=2.3` needs 3.11+).
+* **`library`** uses `requires-python = ">=3.12"`, since a published package should install on more than one Python.
+  The floor follows numpy, which requires 3.12+ as of numpy 2.5, in line with the scientific Python
+  [SPEC 0](https://scientific-python.org/specs/spec-0000/) support window. Supporting older Pythons than numpy
+  does would buy little for CAVE-ecosystem users. CI tests 3.12 through 3.14.
 
 ## Common Commands / Poe Tasks
 
