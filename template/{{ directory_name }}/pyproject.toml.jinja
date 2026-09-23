@@ -7,7 +7,7 @@ name = "{{ project_slug }}"
 version = "{% if template_type in ['oneoff', 'tabula-rasa'] %}0.0.0{% else %}{{ initial_version }}{% endif %}"
 description = "{{ project_description }}"
 {% if template_type == 'library' %}readme = "README.md"{% endif %}
-requires-python = "{% if template_type == 'oneoff' %}>=3.12{% else %}>=3.10{% endif %}"
+requires-python = ">={% if template_type == 'library' %}3.12{% else %}{{ python_version }}{% endif %}"
 dependencies = [
 {%- if template_type == 'oneoff' %}
     "pandas",

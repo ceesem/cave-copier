@@ -154,7 +154,7 @@ Quick experiments, throwaway analyses. However, because it runs through uv-lock,
 * No version control (no git init)
 * No pre-commit hooks
 * Includes notebook.ipynb
-* Python 3.12 default
+* Python 3.13 default
 
 ### 2. `analysis`
 
@@ -169,7 +169,7 @@ Longer-term analysis projects, such as for a paper
 * Empty default dependencies
 * Profiling tools (scalene, pyinstrument)
 * Structured src/ package layout
-* Python 3.12 default
+* Python 3.13 default
 
 ### 3. `library`
 
@@ -183,9 +183,9 @@ Publishable Python libraries with documentation and testing
 * pytest with coverage
 * mkdocs documentation with auto-API generation
 * bump-my-version for semantic versioning
-* GitHub Actions (testing on Python 3.9-3.12, docs publishing)
+* GitHub Actions (testing on Python 3.12-3.14, docs publishing, PyPI publishing on release)
 * Scratch environment for development
-* Python 3.10+ testing
+* Supports Python 3.12+ (`requires-python = ">=3.12"`)
 
 #### Notes
 
@@ -209,7 +209,7 @@ The library `.venv` can be launched as a kernel from either the main directory o
 * Kubernetes deployment templates
 * Scripts for cluster management
 * Task queue management commands
-* Python 3.12 default
+* Python 3.13 default
 
 #### Notes
 

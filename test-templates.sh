@@ -38,7 +38,7 @@ test_template() {
         --data "user_email=test@example.com" \
         --data "github_user=testuser" \
         --data "initial_version=0.0.1" \
-        --data "python_version=3.12" \
+        --data "python_version=3.13" \
         --data "use_vim_jupyter=true" \
         "$SCRIPT_DIR" \
         .
@@ -88,7 +88,7 @@ test_template() {
 
     # Check pyproject.toml is valid
     echo "✓ Validating pyproject.toml..."
-    uv run --python 3.12 python -c "import tomllib; f=open('pyproject.toml','rb'); tomllib.load(f)" || {
+    uv run --python 3.13 python -c "import tomllib; f=open('pyproject.toml','rb'); tomllib.load(f)" || {
         echo "✗ pyproject.toml is not valid TOML"
         exit 1
     }
