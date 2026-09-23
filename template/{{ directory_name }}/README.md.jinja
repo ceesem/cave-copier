@@ -28,15 +28,29 @@ poe test
 poe doc-preview
 ```
 
-### Versioning
+### Versioning and Releasing
 
 ```bash
 # Dry run to see what will change
 poe drybump patch
 
-# Actually bump the version
+# Bump the version, commit, tag and push
 poe bump patch  # or minor, or major
+
+# Publish the new version to PyPI
+gh release create vX.Y.Z --generate-notes
 ```
+
+`poe bump` refuses to run if the current version was never published to PyPI
+(set `BUMP_ALLOW_UNRELEASED=1` to override). In a new project, publish the initial
+version with `gh release create v{{ initial_version }} --generate-notes` before the first bump.
+
+Creating a GitHub Release runs `.github/workflows/publish.yml`, which checks the tag,
+runs the tests, builds, and uploads to PyPI using trusted publishing. One-time setup:
+
+1. On PyPI, add a trusted publisher (a "pending publisher" if the project doesn't exist yet):
+   owner `{{ github_user }}`, repository `{{ project_slug }}`, workflow `publish.yml`, environment `pypi`.
+2. On GitHub, create an environment named `pypi` in the repo settings.
 {% endif %}
 {% if template_type == 'task' %}
 ## Task Queue Setup

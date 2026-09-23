@@ -127,7 +127,8 @@ _message_after_copy: |
   6. Use `poe test` to run tests
   7. Use `poe doc-preview` to preview docs
   8. Use `poe bump patch` to version
-  9. Release via `uv build` and `uv publish`
+  9. Set up PyPI trusted publishing (see Release Process in CLAUDE.md)
+  10. Release via `gh release create vX.Y.Z --generate-notes`
   {% elif template_type == 'task' %}
   Next steps:
   1. cd {{ directory_name }}

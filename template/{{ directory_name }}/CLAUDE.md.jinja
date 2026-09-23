@@ -36,7 +36,7 @@ uv run ruff format src/
 | `poe test` | Run pytest with coverage |
 | `poe doc-preview` | Preview documentation locally |
 | `poe drybump patch/minor/major` | Dry-run version bump |
-| `poe bump patch/minor/major` | Bump version and create tag |
+| `poe bump patch/minor/major` | Bump version, commit, tag and push |
 {%- endif %}
 {%- if template_type == 'task' %}
 | `poe insert_tasks` | Insert tasks into the task queue |
@@ -82,12 +82,32 @@ uv run pytest --cov={{project_slug}} --cov-report=html tests/  # HTML report
 
 ### Release Process
 
+Releasing is two steps: bump the version, then publish it.
+
 ```bash
 poe drybump patch   # preview what will change
-poe bump patch      # bump version, commit, tag (also: minor, major)
+poe bump patch      # bump version, commit, tag, push (also: minor, major)
+gh release create vX.Y.Z --generate-notes   # publish to PyPI
 ```
 
-This updates `pyproject.toml`, `src/{{project_slug}}/__init__.py`, commits, and tags.
+`poe bump patch|minor|major`:
+
+- refuses if the current version isn't on PyPI yet, since bumping would skip a
+  version nobody can install (override with `BUMP_ALLOW_UNRELEASED=1`). In a new
+  project the first bump is refused until the initial version is published.
+- updates `pyproject.toml` and `src/{{project_slug}}/__init__.py`, runs `uv sync`, commits and tags `vX.Y.Z`
+- pushes the commit and tag with `git push --follow-tags`
+- prints `Bumped version: X → Y`
+
+Publishing is a separate step: creating a GitHub Release (`gh release create vX.Y.Z --generate-notes`)
+triggers `.github/workflows/publish.yml`, which checks that the tag matches the package version,
+runs the tests, builds, and uploads to PyPI with trusted publishing (no API token).
+
+One-time setup per project (the template can't do this for you):
+
+1. On PyPI, add a trusted publisher (a "pending publisher" if the project doesn't exist yet):
+   owner `{{github_user}}`, repository `{{project_slug}}`, workflow `publish.yml`, environment `pypi`.
+2. On GitHub, create an environment named `pypi` in the repo settings.
 
 ### Scratch Dir
 
