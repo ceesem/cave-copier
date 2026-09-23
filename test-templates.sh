@@ -32,7 +32,6 @@ test_template() {
         --data "template_type=${template_type}" \
         --data "project_name=${project_name}" \
         --data "project_slug=${project_name//-/_}" \
-        --data "directory_name=${project_name}" \
         --data "project_description=Test project for ${template_type}" \
         --data "user_name=Test User" \
         --data "user_email=test@example.com" \
@@ -41,7 +40,7 @@ test_template() {
         --data "python_version=3.13" \
         --data "use_vim_jupyter=true" \
         "$SCRIPT_DIR" \
-        .
+        "${project_name}"
 
     cd "${project_name}"
 

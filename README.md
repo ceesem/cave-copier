@@ -84,6 +84,11 @@ The recommended approach for creating new project templates for copier is to use
 copier copy --trust gh:ceesem/cave-copier /path/to/new-project
 ```
 
+The destination path *is* the project directory: copier creates it if it doesn't exist,
+and the project name defaults to the directory name (`~/Work/Code/cell-pax` gives project name `cell-pax`
+and package name `cell_pax`). The answers file `.copier-answers.yml` is written inside the project,
+where it should be committed so that `copier update` works later.
+
 You'll be prompted to choose:
 
 1. **Template type** (`oneoff`/`analysis`/`library`/`task`): This will determine the features and structure of your new project. See the [Template Types](#template-types) section above for details on each type.
@@ -132,10 +137,34 @@ You can update an existing project after building out your project with.
 
 ```bash
 cd /path/to/existing-project
-copier update
+copier update --trust
 ```
 
 This will re-ask all of the questions from the initial generation, but will pre-fill them with your existing answers if the parameters are the same.
+Add `--skip-answered` to only be asked new questions.
+Tasks like `uv sync` only run on creation, so afterward review the changes with `git diff` and run `uv sync` yourself.
+
+#### Migrating projects created before 2.0.0
+
+Before 2.0.0, the template generated the project in a *subdirectory* of the copier destination
+(`copier copy gh:ceesem/cave-copier ~/Work/Code` created `~/Work/Code/<directory_name>/`).
+As a result, `.copier-answers.yml` was written to the parent directory, where each new project overwrote the last one,
+and `copier update` run inside a project created a nested `<project>/<project>/` copy instead of updating it.
+
+Copier can't merge across that layout change, so migrate each project once with `copier recopy`, which re-renders the
+current template from your saved answers:
+
+1. Make sure `.copier-answers.yml` is in the project directory. If it's in the parent directory instead,
+   move it in (only if its `directory_name` matches this project), or write one by hand from another project's answers.
+2. Commit or stash all changes, so the recopy is easy to review.
+3. Run `copier recopy --trust --skip-answered --overwrite` in the project directory.
+   This rewrites every template file from scratch, including ones you've since made your own.
+4. Restore the files that are yours, e.g. `git checkout -- src tests docs README.md`,
+   plus any files the recopy re-created that you had deleted on purpose (check `git status` for untracked files).
+5. Review the rest with `git diff` (or `git add -p`): keep the template's updates and restore your own customizations,
+   especially dependencies and settings in `pyproject.toml`. Then run `uv sync` and commit, including `.copier-answers.yml`.
+
+After that, plain `copier update` works.
 
 In principle, that also should allow some level of upgrading between template types, e.g. from `oneoff` to `analysis` to `library` or `task`.
 

@@ -18,18 +18,13 @@ template_type:
 project_name:
   type: str
   help: What is your project name?
-  default: "My Project"
+  default: "{{ _copier_conf.dst_path | basename }}"
   validator: "{% if not project_name %}Required{% endif %}"
 
 project_slug:
   type: str
   help: Python package name
   default: "{{ project_name.lower().replace(' ', '_').replace('-', '_') }}"
-
-directory_name:
-  type: str
-  help: Directory name for the project
-  default: "{{ project_name.lower().replace(' ', '_') }}"
 
 project_description:
   type: str
@@ -90,16 +85,20 @@ _jinja_extensions:
 
 # Tasks to run after generation
 _tasks:
-  - "cd {{ directory_name }} && uv sync"
-  - "{% if template_type == 'library' %}cd {{ directory_name }}/scratch && uv sync{% endif %}"
-  # git init, pre-commit install, and chmod only run on copier copy/recopy, not update.
-  # _copier_operation is "update" for all phases of copier update (including the
-  # old-copy temp-dir phase that triggers the nested-submodule git add failure).
-  - command: "cd {{ directory_name }} && git init"
+  # All tasks only run on copier copy/recopy, not update.
+  # _copier_operation is "update" for all phases of copier update, including the
+  # old-copy temp-dir phase, where uv sync is wasted work (and fails if that old
+  # template version had a broken lock) and git add hits a nested-submodule failure.
+  # After an update, run `uv sync` yourself.
+  - command: "uv sync"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: "cd scratch && uv sync"
+    when: "{{ _copier_operation == 'copy' and template_type == 'library' }}"
+  - command: "git init"
     when: "{{ _copier_operation == 'copy' and template_type not in ['oneoff'] }}"
-  - command: "cd {{ directory_name }} && uvx pre-commit install"
+  - command: "uvx pre-commit install"
     when: "{{ _copier_operation == 'copy' and template_type not in ['oneoff'] }}"
-  - command: "cd {{ directory_name }} && chmod +x .bmv-post-commit.sh"
+  - command: "chmod +x .bmv-post-commit.sh"
     when: "{{ _copier_operation == 'copy' and template_type == 'library' }}"
 
 # Message to display after generation
@@ -108,18 +107,18 @@ _message_after_copy: |
 
   {% if template_type == 'oneoff' %}
   Next steps:
-  1. cd {{ directory_name }}
+  1. cd {{ _copier_conf.dst_path }}
   2. Start coding in notebook.ipynb or create new Python files
   3. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
   {% elif template_type == 'analysis' %}
   Next steps:
-  1. cd {{ directory_name }}
+  1. cd {{ _copier_conf.dst_path }}
   2. Add your dependencies to pyproject.toml via `uv add`
-  4. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
-  5. Put any analysis library code in src/{{ project_slug }}/
+  3. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
+  4. Put any analysis library code in src/{{ project_slug }}/
   {% elif template_type == 'library' %}
   Next steps:
-  1. cd {{ directory_name }}
+  1. cd {{ _copier_conf.dst_path }}
   2. Add your dependencies to pyproject.toml via `uv add`
   3. Implement your library in src/{{ project_slug }}/
   4. Write tests in tests/
@@ -131,12 +130,12 @@ _message_after_copy: |
   10. Release via `gh release create vX.Y.Z --generate-notes`
   {% elif template_type == 'task' %}
   Next steps:
-  1. cd {{ directory_name }}
+  1. cd {{ _copier_conf.dst_path }}
   2. Implement your task in src/{{ project_slug }}/task.py
-  3. Follow steps in  {{ directory_name }}/HOW_TO_USE_TASKS.md for local or cloud task management
+  3. Follow steps in HOW_TO_USE_TASKS.md for local or cloud task management
   {% elif template_type == 'tabula-rasa' %}
   Next steps:
-  1. cd {{ directory_name }}
+  1. cd {{ _copier_conf.dst_path }}
   2. Add your dependencies to pyproject.toml via `uv add`
   3. Use `poe lab` to launch Jupyter Lab or run notebooks in vscode
   4. Put any code in src/{{ project_slug }}/
@@ -144,13 +143,9 @@ _message_after_copy: |
 
 # Message to display after update
 _message_after_update: |
-  Your project has been updated!
+  Your {{ template_type }} project has been updated!
 
-  {% if _copier_conf.answers_file.template_type != template_type %}
-  🎉 Template type changed from {{ _copier_conf.answers_file.template_type }} to {{ template_type }}!
-
-  This is a major upgrade. Please review the changes carefully:
-  - New files and directories have been added
-  - Your pyproject.toml has been updated
-  - Run `uv sync` to update dependencies
-  {% endif %}
+  Next steps:
+  1. Review the changes with `git diff` and resolve any conflicts (*.rej files or inline markers)
+  2. Run `uv sync` to update dependencies and uv.lock{% if template_type == 'library' %} (and `cd scratch && uv sync`){% endif %}
+  3. If you changed template type, expect new files and directories and a reworked pyproject.toml
