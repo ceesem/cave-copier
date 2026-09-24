@@ -42,10 +42,11 @@ The current toolset is:
 6. Pre-commit format checking : `pre-commit` used with `ruff`. Pre-commit is installed and initialized after project creation, and its hooks run the project's own `ruff` (via `uv run`), so the version always matches `uv.lock`.
 7. Version control: `git`.  If this is not installed, follow instructions online.
 8. Automated testing and documnentation : GitHub Actions. This is handled via files in the `.github/workflows` directory and needs no additional installation.
-9. Profiling via [`pyinstrument`](https://pyinstrument.readthedocs.io/) (CPU) and [`memray`](https://bloomberg.github.io/memray/) (memory). These aren't project dependencies; the `poe` tasks fetch them on demand with `uv run --with`, so they stay out of `uv.lock`, the virtual environment, and Docker images. Use `poe profile` to profile CPU time and `poe profile-mem` / `poe profile-mem-view` to profile memory allocations.
-10. Script-aliasing: [`poethepoet`](https://poethepoet.natn.io). This allows defining common commands in `pyproject.toml` and running them with `poe <taskname>`. This is optional but highly recommended.
-11. Notesbooks via either vscode or jupyterlab. No installations necesary, this is managed through `uv`.
-12. For large tasks only: `python-task-queue`. This adds a simple way to build queues that can be distributed across many workers in the cloud. This is managed by `uv` in the `task` template.
+9. Publishing to PyPI (`library` only): a GitHub Actions workflow builds the package and uploads it to PyPI whenever you create a GitHub Release. It uses [PyPI trusted publishing](https://docs.pypi.org/trusted-publishers/), so there's no API token to manage, but each new library needs a one-time setup; see [Releasing to PyPI](#3-library).
+10. Profiling via [`pyinstrument`](https://pyinstrument.readthedocs.io/) (CPU) and [`memray`](https://bloomberg.github.io/memray/) (memory). These aren't project dependencies; the `poe` tasks fetch them on demand with `uv run --with`, so they stay out of `uv.lock`, the virtual environment, and Docker images. Use `poe profile` to profile CPU time and `poe profile-mem` / `poe profile-mem-view` to profile memory allocations.
+11. Script-aliasing: [`poethepoet`](https://poethepoet.natn.io). This allows defining common commands in `pyproject.toml` and running them with `poe <taskname>`. This is optional but highly recommended.
+12. Notesbooks via either vscode or jupyterlab. No installations necesary, this is managed through `uv`.
+13. For large tasks only: `python-task-queue`. This adds a simple way to build queues that can be distributed across many workers in the cloud. This is managed by `uv` in the `task` template.
 
 ## Before You Start
 
