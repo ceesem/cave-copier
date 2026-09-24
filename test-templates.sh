@@ -157,7 +157,8 @@ for template_type in "${TEMPLATE_TYPES[@]}"; do
 done
 
 # Releases before 2.0.0 generated projects in a subdirectory and can't be updated in place.
-BASE_TAG=$(git -C "$SCRIPT_DIR" tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+# --no-contains HEAD skips a tag on HEAD itself, which would make the update a no-op.
+BASE_TAG=$(git -C "$SCRIPT_DIR" tag --no-contains HEAD --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
 if [ -z "$BASE_TAG" ] || [ "${BASE_TAG%%.*}" -lt 2 ]; then
     echo ""
     echo "⚠ Skipping update tests: no release tag >= 2.0.0 found (need tags; in CI, checkout with fetch-depth: 0)"
