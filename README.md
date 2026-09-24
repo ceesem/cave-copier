@@ -16,7 +16,7 @@ A unified [copier](https://copier.readthedocs.io/) template for creating Python 
 
 ## TLDR
 
-If you have already set up your environment with `pipx`, `uv`, `copier`, and`poethepoet`, you can create a new project with:
+If you have already installed `uv`, `copier`, and `poethepoet` (see [Before You Start](#before-you-start)), you can create a new project with:
 
 ```bash
 copier copy --trust gh:ceesem/cave-copier /path/to/new-project
@@ -33,42 +33,46 @@ This template supports four project types:
 
 The current toolset is:
 
-0. Python application management: `pipx`. This is used to install various tools and is a variation of `pip` designed for command-line applications. Rather than installing in a specific environment, it installs in a separate environment and creates a symlink to the executable in the user's path. This is useful for tools that are used across multiple projects and need to be kept up to date. 
+0. Python application management: `uv tool`. This installs command-line tools like `copier` and `poe` into their own isolated environments and puts them on your path, so they're available across all projects.
 1. Environment Management : `uv` This will be used to manage the virtual environment for all projects, as well as building, publishing, and testing libraries.
 2. Code Formatting : `ruff`. This will be installed within a virtual environment and is managed by `uv`, although it is also useful to install the VSCode extension for it if you use that editor.
 3. Testing : `pytest`. This will be installed within a virtual environment and is managed by `uv`.
 4. Documentation : `mkdocs-material` and `mkdocstrings`. This will be installed within a virtual environment and is managed by `uv`.
 5. Version Management : `bump-my-version`. This will be installed within a virtual environment and is managed by `uv`.
-6. Pre-commit format checking : `pre-commit` used with `ruff`. Pre-commit is run and/or installed and initialized by `uv` after cookiecutter creation. 
+6. Pre-commit format checking : `pre-commit` used with `ruff`. Pre-commit is installed and initialized after project creation, and its hooks run the project's own `ruff` (via `uv run`), so the version always matches `uv.lock`.
 7. Version control: `git`.  If this is not installed, follow instructions online.
 8. Automated testing and documnentation : GitHub Actions. This is handled via files in the `.github/workflows` directory and needs no additional installation.
-9. Profiling via `scalene` and `pyinstrument`. These are installed and managed by `uv`. Use `poe profile-all` to profile cpu and memory with `scalene` and `poe profile` to profile cpu in an aesthetically nicer way with `pyinstrument`.
+9. Profiling via [`pyinstrument`](https://pyinstrument.readthedocs.io/) (CPU) and [`memray`](https://bloomberg.github.io/memray/) (memory). These aren't project dependencies; the `poe` tasks fetch them on demand with `uv run --with`, so they stay out of `uv.lock`, the virtual environment, and Docker images. Use `poe profile` to profile CPU time and `poe profile-mem` / `poe profile-mem-view` to profile memory allocations.
 10. Script-aliasing: [`poethepoet`](https://poethepoet.natn.io). This allows defining common commands in `pyproject.toml` and running them with `poe <taskname>`. This is optional but highly recommended.
 11. Notesbooks via either vscode or jupyterlab. No installations necesary, this is managed through `uv`.
 12. For large tasks only: `python-task-queue`. This adds a simple way to build queues that can be distributed across many workers in the cloud. This is managed by `uv` in the `task` template.
 
 ## Before You Start
 
-There are four items that need to be installed by hand before you use these templates.
+There are three items that need to be installed by hand before you use these templates.
 If you already have any of them installed, you can skip that step.
 
-1. Install [pipx](https://pipx.pypa.io/). You will only need to install `pipx` once on your computer. It is the most manual installation and should be done first. See [pipx documentation](https://pipx.pypa.io/stable/) for installation instructions.
-2. Install [uv](https://docs.astral.sh/uv/). You can install with pipx via 
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/). This is the only manual installation and should be done first:
 
 ```bash
-pipx install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. Install [copier](https://copier.readthedocs.io/) >= 9.0.0 and the `jinja2-time` extension. Do this with pipx:
-```bash
-pipx install copier && pipx inject copier jinja2-time
-```
-
-3. (Optional but highly recommended) Install [poethepoet](https://poethepoet.natn.io/) via pipx:
+2. Install [copier](https://copier.readthedocs.io/) >= 9.6.0 and the `jinja2-time` extension as a uv tool:
 
 ```bash
-pipx install poethepoet
+uv tool install copier --with jinja2-time
 ```
+
+3. (Optional but highly recommended) Install [poethepoet](https://poethepoet.natn.io/) as a uv tool:
+
+```bash
+uv tool install poethepoet
+```
+
+Upgrade them later with `uv tool upgrade --all`.
+If you previously installed any of these with `pipx`, uninstall that copy (e.g. `pipx uninstall copier`)
+so you don't end up with two versions on your `PATH`.
 
 ## Usage
 
@@ -197,7 +201,7 @@ Longer-term analysis projects, such as for a paper
 * Git version control
 * Pre-commit hooks with ruff for linting and formatting
 * Empty default dependencies
-* Profiling tools (scalene, pyinstrument)
+* Profiling tasks (pyinstrument for CPU, memray for memory, fetched on demand)
 * Structured src/ package layout
 * Python 3.13 default
 
@@ -214,6 +218,7 @@ Publishable Python libraries with documentation and testing
 * mkdocs documentation with auto-API generation
 * bump-my-version for semantic versioning
 * GitHub Actions (testing on Python 3.12-3.14, docs publishing, PyPI publishing on release)
+* Dependabot for monthly grouped updates of GitHub Actions and `uv.lock`
 * Scratch environment for development
 * Supports Python 3.12+ (`requires-python = ">=3.12"`, see [Python Versions](#python-versions))
 
@@ -298,7 +303,8 @@ You can always list available poe tasks by simply typing `poe` in the project di
 ### `analysis`, `library`, `task`:
 
 * `poe profile <your-script>` - Profile CPU with pyinstrument
-* `poe profile-all <your-script>` - Profile CPU and memory with scalene
+* `poe profile-mem <your-script>` - Profile memory allocations with memray (`--native` to include C extensions)
+* `poe profile-mem-view` - Open a flame graph of the last memray profile (`--leaks` for leaks)
 
 ### `library` only:
 

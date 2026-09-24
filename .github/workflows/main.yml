@@ -16,9 +16,11 @@ jobs:
         python-version: ["3.12"]
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # release tags are needed for the update test
       - name: Install uv
         uses: astral-sh/setup-uv@v10.2.0
       - name: Install copier
-        run: pipx install copier && pipx inject copier jinja2-time
+        run: uv tool install copier --with jinja2-time
       - name: Run template test
         run: bash ./test-templates.sh

@@ -29,7 +29,8 @@ uv run ruff format src/
 | `poe lab` | Launch Jupyter Lab |
 {%- if template_type in ['analysis', 'library', 'task'] %}
 | `poe profile` | Profile CPU with pyinstrument (HTML report) |
-| `poe profile-all` | Profile CPU + memory with scalene |
+| `poe profile-mem` | Profile memory allocations with memray |
+| `poe profile-mem-view` | Open a flame graph of the last memray profile |
 {%- endif %}
 {%- if template_type == 'library' %}
 | `poe scratch-lab` | Jupyter Lab in the scratch/ directory |
@@ -61,7 +62,9 @@ Reusable code lives in `src/{{project_slug}}/`. Notebooks and scripts import fro
 ### Profiling
 
 - `poe profile <script.py>` — CPU profiling via pyinstrument (HTML report, good for iterating)
-- `poe profile-all <script.py>` — CPU + memory via scalene (use when memory is suspect)
+- `poe profile-mem <script.py>` — memory allocations via memray (use when memory is suspect; add `--native` to see allocations inside C extensions like numpy); view with `poe profile-mem-view` (`--leaks` for leaks)
+
+The profilers aren't project dependencies: the tasks fetch them on demand with `uv run --with`.
 
 {% elif template_type == 'library' -%}
 ## Library Development

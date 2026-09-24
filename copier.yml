@@ -1,7 +1,8 @@
 # Copier template configuration for uv-based Python projects
 
 # Minimum copier version required
-_min_copier_version: "9.0.0"
+# 9.6.0 added _copier_operation, which the tasks rely on
+_min_copier_version: "9.6.0"
 
 # Questions asked during template generation
 template_type:

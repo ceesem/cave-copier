@@ -1,11 +1,22 @@
+# Runs ruff from the project environment, so pre-commit always uses the same
+# ruff version as `uv run ruff` and CI (pinned in uv.lock, updated with the lock).
 repos:
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.14.9
+- repo: local
   hooks:
     # Run the linter.
     - id: ruff
-      types_or: [ python, pyi]
-    - id: ruff
-      args: ["--select", "I", "--fix"]
+      name: ruff check
+      entry: uv run --frozen ruff check --force-exclude
+      language: system
+      types_or: [python, pyi]
+    # Sort imports.
+    - id: ruff-isort
+      name: ruff isort
+      entry: uv run --frozen ruff check --force-exclude --select I --fix
+      language: system
+      types_or: [python, pyi]
     - id: ruff-format
-      types_or: [ python, pyi]
+      name: ruff format
+      entry: uv run --frozen ruff format --force-exclude
+      language: system
+      types_or: [python, pyi]

@@ -18,13 +18,26 @@ extend-exclude = ["*.ipynb"]
 [tool.ruff.lint]
 select=["E9","F63","F7","F82"]
 
-[tool.poe.tasks.profile-all]
-cmd = "uv run scalene"
-help = "Profile cpu and memory of task with scalene"
+[tool.poe.tasks.profile-mem]
+cmd = "uv run --with memray memray run --force --output memray-profile.bin"
+help = "Profile memory allocations of a script with memray (installed on demand). Add --native to include C extension frames."
+
+[tool.poe.tasks.profile-mem-view]
+help = "Open a flame graph of the last memray profile"
+shell = """
+set -e
+uv run --with memray memray flamegraph --force --output memray-flamegraph.html ${leaks:+--leaks} memray-profile.bin
+uv run python -m webbrowser -t "file://$PWD/memray-flamegraph.html"
+"""
+
+[[tool.poe.tasks.profile-mem-view.args]]
+name = "leaks"
+type = "boolean"
+help = "Show leaked memory instead of peak usage (profile with --trace-python-allocators for accurate leaks)"
 
 [tool.poe.tasks.profile]
-cmd = "uv run pyinstrument -r html"
-help = "Profile cpu of task with pyinstrument"
+cmd = "uv run --with pyinstrument pyinstrument -r html"
+help = "Profile cpu of a script with pyinstrument (installed on demand)"
 
 [tool.poe.tasks.scratch-lab]
 cmd = "uv run --with jupyterlab{% if use_vim_jupyter %} --with jupyterlab-vim{% endif %} --with jupyterlab-code-formatter --with jupyter-resource-usage --with jupyterlab-execute-time --with catppuccin-jupyterlab --with ipywidgets jupyter lab --no-browser"

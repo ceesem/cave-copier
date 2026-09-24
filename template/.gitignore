@@ -37,6 +37,10 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+
+# Profiler output
+memray-profile.bin
+memray-flamegraph.html
 .tox/
 .coverage
 .coverage.*

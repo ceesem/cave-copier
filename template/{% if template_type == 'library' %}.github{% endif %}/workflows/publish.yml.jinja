@@ -21,7 +21,7 @@ jobs:
             exit 1
           fi
       - name: Run tests
-        run: uv run pytest tests
+        run: uv run --locked pytest tests
       - name: Build
         run: uv build
       - uses: actions/upload-artifact@v7

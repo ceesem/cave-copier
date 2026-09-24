@@ -1,0 +1,11 @@
+# Keep this repo's own CI actions current. (Generated projects get their own
+# dependabot.yml; the template's workflow files are Jinja and aren't scanned.)
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns: ["*"]
