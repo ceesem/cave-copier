@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0  # release tags are needed for the update test
       - name: Install uv
-        uses: astral-sh/setup-uv@v10.2.0
+        uses: astral-sh/setup-uv@v10.3.3
       - name: Install copier
         run: uv tool install copier --with jinja2-time
       - name: Run template test
